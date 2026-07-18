@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function ContactUs() {
+function ContactUs() {
+    const navigate = useNavigate();
   const [form, setForm] = useState({ name: "", phone: "", message: "" });
 
   const handleChange = (e) => {
@@ -107,14 +109,17 @@ export default function ContactUs() {
             />
           </div>
 
-          <button
-            onClick={handleSubmit}
-            className="bg-blue-800 hover:bg-blue-900 text-white font-semibold px-6 py-3 rounded-lg transition"
-          >
-            Book Appointment
-          </button>
+         <button
+  onClick={() => navigate("/book")}
+  className="bg-blue-800 hover:bg-blue-900 text-white font-semibold px-6 py-3 rounded-lg transition"
+>
+  Book Appointment
+</button>
         </div>
       </div>
     </div>
   );
 }
+
+
+export default ContactUs
