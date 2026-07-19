@@ -7,6 +7,7 @@ import { Routes, Route} from "react-router-dom";
 import ContactUs from "./ContactUs/ContactUs"
 import PatientAppointmentForm from "./Services/Form"
 import InternshipForm from "./Internship/InternshipForm"
+import DetailPage from "./Internship/DetailPage"
 
 function App() {
  
@@ -22,7 +23,10 @@ function App() {
   <Route path="/contact" element={<ContactUs />} />
 </Routes> */}
 
-<InternshipForm/>
+  <Routes>
+        <Route path="/" element={<DetailPage />} />
+        <Route path="/internship-form" element={<InternshipForm />} />
+      </Routes>
    
     </>
   )

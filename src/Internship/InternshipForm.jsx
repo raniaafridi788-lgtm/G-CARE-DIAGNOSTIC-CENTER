@@ -1,25 +1,24 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { Check, UploadCloud, FileText, CircleCheck } from "lucide-react";
 
+
 const SECTIONS = [
   { id: "personal", label: "Personal Information", required: ["fullName", "dob", "nationality", "phone", "email", "address", "city"] },
   { id: "academic", label: "Academic Background", required: ["school", "program", "year"] },
   { id: "preferences", label: "Internship Preferences", required: ["startDate", "endDate"] },
-  { id: "compliance", label: "Health & Compliance", required: [] },
   { id: "documents", label: "Documents & Declaration", required: ["agree"] },
 ];
 
 const MODALITIES = [
-  "Diagnostic X-Ray", "CT", "MRI", "Ultrasound",
-  "Mammography", "Echocardiography", ,
+  "Diagnostic X-Ray",
+  "CT",
+  "MRI",
+  "Ultrasound",
+  "Mammography",
+  "Echocardiography",
 ];
 
-const COMPLIANCE_ITEMS = [
-  { key: "immunization", label: "Immunization records / TB screening up to date", note: "Required before your first day on any imaging floor." },
-  { key: "hipaa", label: "Completed HIPAA / patient privacy training", note: "Certificate must be dated within the last 12 months." },
-  { key: "radiation", label: "Radiation safety orientation completed", note: "Contact the program office if you need this scheduled." },
-  { key: "background", label: "Valid background check on file", note: "Issued within the past 6 months." },
-];
+
 
 function Field({ label, required, children }) {
   return (
@@ -46,7 +45,6 @@ const inputClasses =
     agree: false,
   });
   const [modalities, setModalities] = useState([]);
-  const [compliance, setCompliance] = useState({});
   const [files, setFiles] = useState([]);
   const [activeSection, setActiveSection] = useState("personal");
   const [submitted, setSubmitted] = useState(false);
@@ -76,20 +74,20 @@ const inputClasses =
     return () => observer.disconnect();
   }, []);
 
-  const doneMap = useMemo(() => {
-    const map = {};
-    SECTIONS.forEach((sec) => {
-      if (sec.required.length === 0) {
-        map[sec.id] = sec.id === "compliance" ? Object.values(compliance).some(Boolean) : false;
-      } else {
-        map[sec.id] = sec.required.every((key) => {
-          const val = data[key];
-          return typeof val === "boolean" ? val : String(val || "").trim() !== "";
-        });
-      }
+ const doneMap = useMemo(() => {
+  const map = {};
+
+  SECTIONS.forEach((sec) => {
+    map[sec.id] = sec.required.every((key) => {
+      const val = data[key];
+      return typeof val === "boolean"
+        ? val
+        : String(val || "").trim() !== "";
     });
-    return map;
-  }, [data, compliance]);
+  });
+
+  return map;
+}, [data]);
 
   const scrollTo = (id) => {
     sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -106,10 +104,6 @@ const inputClasses =
     );
   };
 
-  const toggleCompliance = (key) => {
-    setCompliance((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
-
   const handleFiles = (e) => {
     setFiles(Array.from(e.target.files || []).map((f) => f.name));
   };
@@ -124,6 +118,8 @@ const inputClasses =
     setSubmitted(true);
   };
 
+
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800">
       {/* Top bar */}
@@ -134,6 +130,7 @@ const inputClasses =
         </div>
         <div className="hidden sm:block">INTERNSHIP PORTAL</div>
       </div>
+  
 
       {/* Header */}
       <div className="mx-auto max-w-5xl border-b border-slate-200 px-6 pb-7 pt-10">
@@ -361,87 +358,109 @@ const inputClasses =
             </div>
           </section>
 
-          {/* 4. Compliance */}
-          <section id="compliance" ref={setSectionRef("compliance")} className="scroll-mt-6 overflow-hidden rounded-lg border border-slate-200 bg-white">
-            <div className="bg-blue-950 px-6 py-4">
-              <div className="flex items-center gap-3">
-                <span className="rounded-full border border-white/30 px-2 py-0.5 font-mono text-xs text-white">04</span>
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-white">Health &amp; Compliance</h2>
-              </div>
-            </div>
-            <div className="px-6 py-6">
-              <p className="mb-3 text-xs text-slate-500">
-                Confirm the following. You&apos;ll be asked to upload supporting documents in the next section.
-              </p>
-              <ul className="divide-y divide-slate-200">
-                {COMPLIANCE_ITEMS.map((item) => (
-                  <li key={item.key} className="flex items-start gap-3 py-3">
-                    <input
-                      type="checkbox"
-                      id={item.key}
-                      checked={!!compliance[item.key]}
-                      onChange={() => toggleCompliance(item.key)}
-                      className="mt-1 h-4 w-4 flex-shrink-0 accent-teal-600"
-                    />
-                    <label htmlFor={item.key} className="text-sm text-slate-800">
-                      {item.label}
-                      <span className="mt-0.5 block text-xs text-slate-500">{item.note}</span>
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
+          
+{/* 4. Documents & Declaration */}
+<section
+  id="documents"
+  ref={setSectionRef("documents")}
+  className="scroll-mt-6 overflow-hidden rounded-lg border border-slate-200 bg-white"
+>
+  <div className="bg-blue-950 px-6 py-4">
+    <div className="flex items-center gap-3">
+      <span className="rounded-full border border-white/30 px-2 py-0.5 font-mono text-xs text-white">
+        04
+      </span>
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-white">
+        Documents & Declaration
+      </h2>
+    </div>
+  </div>
 
-          {/* 5. Documents & Declaration */}
-          <section id="documents" ref={setSectionRef("documents")} className="scroll-mt-6 overflow-hidden rounded-lg border border-slate-200 bg-white">
-            <div className="bg-blue-950 px-6 py-4">
-              <div className="flex items-center gap-3">
-                <span className="rounded-full border border-white/30 px-2 py-0.5 font-mono text-xs text-white">05</span>
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-white">Documents &amp; Declaration</h2>
-                </div>
-                </div>
-                <div className="px-6 py-6">
-              <label className="mb-2 block font-mono text-[11px] uppercase tracking-wide text-slate-500">
-                Upload transcript / CV / supporting documents
-              </label>
-              <label className="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-slate-200 bg-slate-50 px-6 py-8 text-center transition hover:border-teal-600 hover:bg-teal-50">
-                <input type="file" multiple onChange={handleFiles} className="hidden" />
-                <UploadCloud className="mb-2 h-5 w-5 text-slate-400" />
-                <span className="text-xs text-slate-500">Click to choose files, or drag them here — PDF, DOC, JPG up to 10MB each</span>
-              </label>
-              {files.length > 0 && (
-                <ul className="mt-3 space-y-1">
-                  {files.map((name) => (
-                    <li key={name} className="flex items-center gap-2 text-xs font-semibold text-teal-700">
-                      <FileText className="h-3.5 w-3.5" /> {name}
-                    </li>
-                  ))}
-                </ul>
-              )}
+  <div className="px-6 py-6">
 
-              <div className="mt-7 rounded-md border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-relaxed text-slate-500">
-                I certify that the information provided in this application is true and complete to the best of
-                my knowledge. I understand that any false statement may result in rejection of my application or
-                termination of my internship placement. I agree to comply with hospital policy, patient
-                confidentiality standards, and radiation safety protocols during my placement.
-              </div>
+    {/* Upload CV */}
+    <label className="mb-2 block font-mono text-[11px] uppercase tracking-wide text-slate-500">
+      Upload Transcript / CV / Supporting Documents
+    </label>
 
-              <div className="mt-4 flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="agree"
-                  required
-                  checked={data.agree}
-                  onChange={handleChange("agree")}
-                  className="mt-1 h-4 w-4 flex-shrink-0 accent-teal-600"
-                />
-                <label htmlFor="agree" className="text-sm text-slate-800">
-                  I have read and agree to the declaration above<span className="ml-1 text-red-500">*</span>
-                </label>
-              </div>
-            </div>
-          </section>
+    <label className="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-slate-200 bg-slate-50 px-6 py-8 text-center transition hover:border-teal-600 hover:bg-teal-50">
+      <input
+        type="file"
+        multiple
+        onChange={handleFiles}
+        className="hidden"
+      />
+
+      <UploadCloud className="mb-2 h-5 w-5 text-slate-400" />
+
+      <span className="text-xs text-slate-500">
+        Click to choose files, or drag them here — PDF, DOC, JPG up to 10MB each
+      </span>
+    </label>
+
+    {files.length > 0 && (
+      <ul className="mt-3 space-y-1">
+        {files.map((name) => (
+          <li
+            key={name}
+            className="flex items-center gap-2 text-xs font-semibold text-teal-700"
+          >
+            <FileText className="h-3.5 w-3.5" />
+            {name}
+          </li>
+        ))}
+      </ul>
+    )}
+
+    {/* Payment Screenshot */}
+    <div className="mt-8">
+      <label className="mb-2 block font-mono text-[11px] uppercase tracking-wide text-slate-500">
+        Upload Payment Screenshot
+        <span className="ml-1 text-red-500">*</span>
+      </label>
+
+      <label className="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-slate-200 bg-slate-50 px-6 py-8 text-center transition hover:border-teal-600 hover:bg-teal-50">
+        <input
+          type="file"
+          accept="image/png,image/jpeg,image/jpg"
+          required
+          className="hidden"
+        />
+
+        <UploadCloud className="mb-2 h-5 w-5 text-slate-400" />
+
+        <span className="text-xs text-slate-500">
+          Upload your payment screenshot (JPG, PNG, JPEG)
+        </span>
+      </label>
+    </div>
+
+    {/* Declaration */}
+    <div className="mt-7 rounded-md border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-relaxed text-slate-500">
+      I certify that the information provided in this application is true and
+      complete to the best of my knowledge. I understand that any false
+      statement may result in rejection of my application or termination of my
+      internship placement.
+    </div>
+
+    {/* Agree Checkbox */}
+    <div className="mt-4 flex items-start gap-3">
+      <input
+        type="checkbox"
+        id="agree"
+        required
+        checked={data.agree}
+        onChange={handleChange("agree")}
+        className="mt-1 h-4 w-4 flex-shrink-0 accent-teal-600"
+      />
+
+      <label htmlFor="agree" className="text-sm text-slate-800">
+        I have read and agree to the declaration above
+        <span className="ml-1 text-red-500">*</span>
+      </label>
+    </div>
+  </div>
+</section>
 
           {/* Submit bar */}
           <div className="flex flex-wrap items-center justify-between gap-4 px-1 pt-2">
@@ -471,7 +490,7 @@ const inputClasses =
       </div>
 
       <footer className="border-t border-slate-200 px-6 py-6 text-center font-mono text-xs text-slate-400">
-        RIVERSIDE GENERAL HOSPITAL · DEPARTMENT OF RADIOLOGY &amp; IMAGING SCIENCES · 123 MEDICAL PLAZA DR · radiology.internships@rgh.org
+        G Care Diagnotic Cener · 153/1,F Block phase 5 D.H.A, Lahore, Pakistan
       </footer>
     </div>
   );
